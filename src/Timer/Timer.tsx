@@ -71,6 +71,11 @@ export const Timer: React.FC = () => {
               outputRange: [0.4, 1, 0.4],
             });
 
+            const scale = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.4, 1, 0.4],
+            });
+
             return (
               <View
                 style={{
@@ -78,7 +83,8 @@ export const Timer: React.FC = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <Animated.Text style={[styles.text, { opacity }]}>
+                <Animated.Text
+                  style={[styles.text, { opacity, transform: [{ scale }] }]}>
                   {item}
                 </Animated.Text>
               </View>
