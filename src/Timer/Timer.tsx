@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useRef, FC, useCallback } from 'react';
 import {
   Vibration,
   StatusBar,
@@ -23,12 +23,41 @@ const timers = [...Array(13).keys()].map(i => (i === 0 ? 1 : i * 5));
 const ITEM_SIZE = width * 0.38;
 const ITEM_SPACING = (width - ITEM_SIZE) / 2;
 
-export const Timer: React.FC = () => {
-  const scrollX = React.useRef(new Animated.Value(0)).current;
+export const Timer: FC = () => {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [duration, setDuration] = useState(timers[0]);
+  const timerAnimation = useRef(new Animated.Value(height)).current;
+
+  const animation = useCallback(() => {
+    Animated.sequence([
+      Animated.timing(timerAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(timerAnimation, {
+        toValue: height,
+        duration: duration * 1000,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {});
+  }, [duration]);
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFillObject,
+
+          {
+            height,
+            width,
+            backgroundColor: colors.red,
+            transform: [{ translateY: timerAnimation }],
+          },
+        ]}
+      />
+
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
@@ -38,7 +67,7 @@ export const Timer: React.FC = () => {
             paddingBottom: 100,
           },
         ]}>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={animation}>
           <View style={styles.roundButton} />
         </TouchableOpacity>
       </Animated.View>
@@ -73,7 +102,7 @@ export const Timer: React.FC = () => {
 
             const scale = scrollX.interpolate({
               inputRange,
-              outputRange: [0.4, 1, 0.4],
+              outputRange: [0.6, 1, 0.6],
             });
 
             return (
@@ -93,6 +122,11 @@ export const Timer: React.FC = () => {
           horizontal
           bounces={false}
           showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={e => {
+            const index = Math.round(e.nativeEvent.contentOffset.x / ITEM_SIZE);
+
+            setDuration(timers[index]);
+          }}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { x: scrollX } } }],
             { useNativeDriver: true },
