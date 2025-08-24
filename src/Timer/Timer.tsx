@@ -1,14 +1,8 @@
 import { useState, useRef, FC, useCallback } from 'react';
 import {
-  Vibration,
-  StatusBar,
-  Easing,
-  TextInput,
   Dimensions,
   Animated,
   TouchableOpacity,
-  FlatList,
-  Text,
   View,
   StyleSheet,
 } from 'react-native';
